@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp"
+    android:background="@drawable/widget_background"
+    android:id="@+id/widget_root">
+
+    <TextView
+        android:id="@+id/widget_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Focus"
+        android:textSize="12sp"
+        android:textColor="#8b5cf6"
+        android:letterSpacing="0.1" />
+
+    <TextView
+        android:id="@+id/widget_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="25:00"
+        android:textSize="36sp"
+        android:textColor="#f1f0f5"
+        android:fontFamily="sans-serif-light"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:id="@+id/widget_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tap to start"
+        android:textSize="10sp"
+        android:textColor="#5e576e"
+        android:layout_marginTop="4dp" />
+
+</LinearLayout>

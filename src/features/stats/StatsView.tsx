@@ -3,6 +3,7 @@ import { useSessionStore } from '../../store/session-store.ts';
 import { useGameStore } from '../../store/game-store.ts';
 import { GlassCard } from '../../components/ui/GlassCard.tsx';
 import { Heatmap } from './Heatmap.tsx';
+import { ShareStats } from './ShareStats.tsx';
 
 function formatDuration(ms: number): string {
   const hours = Math.floor(ms / 3600000);
@@ -104,6 +105,9 @@ export function StatsView() {
           </div>
         </div>
       </GlassCard>
+
+      {/* Share */}
+      <ShareStats />
     </div>
   );
 }

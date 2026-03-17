@@ -4,6 +4,11 @@ import { GlassCard } from '../../components/ui/GlassCard.tsx';
 import { ENVIRONMENTS, SOUND_PROFILES } from '../../core/constants.ts';
 import { useGameStore } from '../../store/game-store.ts';
 import { StorageService } from '../../services/storage.ts';
+import { TIMER_PRESETS } from '../../core/presets.ts';
+import { THEMES, applyTheme } from '../../core/themes.ts';
+import { PLANT_SPECIES } from '../../core/plants.ts';
+import { useI18n } from '../../core/i18n.ts';
+import type { Locale } from '../../core/i18n.ts';
 
 function DurationInput({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   const minutes = Math.round(value / 60000);
@@ -11,19 +16,9 @@ function DurationInput({ label, value, onChange }: { label: string; value: numbe
     <div className="flex items-center justify-between">
       <span className="text-sm text-text-secondary">{label}</span>
       <div className="flex items-center gap-2">
-        <button
-          onClick={() => onChange(Math.max(60000, value - 300000))}
-          className="w-7 h-7 rounded-lg bg-surface-light text-text-secondary hover:text-text-primary flex items-center justify-center cursor-pointer press-effect"
-        >
-          −
-        </button>
+        <button onClick={() => onChange(Math.max(60000, value - 300000))} className="w-7 h-7 rounded-lg bg-surface-light text-text-secondary hover:text-text-primary flex items-center justify-center cursor-pointer press-effect">−</button>
         <span className="text-sm font-medium w-10 text-center">{minutes}m</span>
-        <button
-          onClick={() => onChange(Math.min(5400000, value + 300000))}
-          className="w-7 h-7 rounded-lg bg-surface-light text-text-secondary hover:text-text-primary flex items-center justify-center cursor-pointer press-effect"
-        >
-          +
-        </button>
+        <button onClick={() => onChange(Math.min(7200000, value + 300000))} className="w-7 h-7 rounded-lg bg-surface-light text-text-secondary hover:text-text-primary flex items-center justify-center cursor-pointer press-effect">+</button>
       </div>
     </div>
   );
@@ -33,10 +28,7 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
   return (
     <div className="flex items-center justify-between">
       <span className="text-sm text-text-secondary">{label}</span>
-      <button
-        onClick={() => onChange(!value)}
-        className={`w-10 h-5 rounded-full transition-colors cursor-pointer ${value ? 'bg-accent' : 'bg-surface-light'}`}
-      >
+      <button onClick={() => onChange(!value)} className={`w-10 h-5 rounded-full transition-colors cursor-pointer ${value ? 'bg-accent' : 'bg-surface-light'}`}>
         <div className={`w-4 h-4 rounded-full bg-white shadow-sm transition-transform mx-0.5 ${value ? 'translate-x-5' : ''}`} />
       </button>
     </div>
@@ -48,6 +40,7 @@ export function SettingsView() {
   const level = useGameStore((s) => s.level);
   const unlockedEnvs = useGameStore((s) => s.unlockedEnvironments);
   const unlockedSounds = useGameStore((s) => s.unlockedSounds);
+  const { locale, setLocale, t } = useI18n();
   const [exportMsg, setExportMsg] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -60,7 +53,7 @@ export function SettingsView() {
     a.download = `focus-universe-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    setExportMsg('Exported!');
+    setExportMsg(t('exported'));
     setTimeout(() => setExportMsg(''), 2000);
   };
 
@@ -69,60 +62,138 @@ export function SettingsView() {
     if (!file) return;
     const text = await file.text();
     await StorageService.importAll(text);
-    setExportMsg('Imported! Refreshing...');
+    setExportMsg(t('imported'));
     setTimeout(() => window.location.reload(), 1000);
+  };
+
+  const applyPreset = (preset: typeof TIMER_PRESETS[number]) => {
+    updateSettings({
+      focusDuration: preset.focus,
+      shortBreakDuration: preset.shortBreak,
+      longBreakDuration: preset.longBreak,
+      longBreakInterval: preset.longBreakInterval,
+    });
+  };
+
+  const selectTheme = (themeId: string) => {
+    const theme = THEMES.find((t) => t.id === themeId);
+    if (theme) {
+      applyTheme(theme);
+      updateSettings({ themeId });
+    }
   };
 
   return (
     <div className="flex flex-col gap-4 p-4 overflow-y-auto max-h-[70vh]">
+      {/* Language */}
+      <GlassCard className="p-4">
+        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">{t('language')}</h3>
+        <div className="flex gap-2">
+          {([['en', '🇬🇧 English'], ['tr', '🇹🇷 Türkçe']] as [Locale, string][]).map(([loc, label]) => (
+            <button
+              key={loc}
+              onClick={() => setLocale(loc)}
+              className={`flex-1 p-2 rounded-lg text-sm transition-all cursor-pointer press-effect ${locale === loc ? 'bg-accent/20 ring-1 ring-accent/40' : 'bg-surface-light hover:bg-surface-lighter'}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </GlassCard>
+
+      {/* Theme */}
+      <GlassCard className="p-4">
+        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">{t('theme')}</h3>
+        <div className="grid grid-cols-4 gap-2">
+          {THEMES.map((theme) => (
+            <button
+              key={theme.id}
+              onClick={() => selectTheme(theme.id)}
+              className={`flex flex-col items-center gap-1 p-2 rounded-lg text-xs transition-all cursor-pointer press-effect ${settings.themeId === theme.id ? 'bg-accent/20 ring-1 ring-accent/40' : 'bg-surface-light hover:bg-surface-lighter'}`}
+            >
+              <span className="text-lg">{theme.emoji}</span>
+              <span className="text-[10px] text-text-secondary truncate w-full text-center">{theme.name}</span>
+            </button>
+          ))}
+        </div>
+      </GlassCard>
+
+      {/* Presets */}
+      <GlassCard className="p-4">
+        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">{t('presets')}</h3>
+        <div className="flex flex-col gap-2">
+          {TIMER_PRESETS.map((preset) => (
+            <div key={preset.id} className="flex items-center gap-3 bg-surface-light/50 rounded-lg p-2">
+              <span className="text-lg">{preset.emoji}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium">{preset.name}</p>
+                <p className="text-[10px] text-text-muted">{preset.description}</p>
+              </div>
+              <button
+                onClick={() => applyPreset(preset)}
+                className="text-[10px] text-accent hover:text-accent-glow px-2 py-1 rounded-md bg-accent/10 cursor-pointer press-effect"
+              >
+                {t('applyPreset')}
+              </button>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
+
       {/* Timer */}
       <GlassCard className="p-4">
-        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">Timer</h3>
+        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">{t('timer')}</h3>
         <div className="flex flex-col gap-3">
-          <DurationInput label="Focus" value={settings.focusDuration} onChange={(v) => updateSettings({ focusDuration: v })} />
-          <DurationInput label="Short Break" value={settings.shortBreakDuration} onChange={(v) => updateSettings({ shortBreakDuration: v })} />
-          <DurationInput label="Long Break" value={settings.longBreakDuration} onChange={(v) => updateSettings({ longBreakDuration: v })} />
-          <Toggle label="Auto-start breaks" value={settings.autoStartBreaks} onChange={(v) => updateSettings({ autoStartBreaks: v })} />
-          <Toggle label="Auto-start focus" value={settings.autoStartFocus} onChange={(v) => updateSettings({ autoStartFocus: v })} />
+          <DurationInput label={t('focus')} value={settings.focusDuration} onChange={(v) => updateSettings({ focusDuration: v })} />
+          <DurationInput label={t('shortBreak')} value={settings.shortBreakDuration} onChange={(v) => updateSettings({ shortBreakDuration: v })} />
+          <DurationInput label={t('longBreak')} value={settings.longBreakDuration} onChange={(v) => updateSettings({ longBreakDuration: v })} />
+          <Toggle label={t('autoStartBreaks')} value={settings.autoStartBreaks} onChange={(v) => updateSettings({ autoStartBreaks: v })} />
+          <Toggle label={t('autoStartFocus')} value={settings.autoStartFocus} onChange={(v) => updateSettings({ autoStartFocus: v })} />
           <div className="flex items-center justify-between">
-            <span className="text-sm text-text-secondary">Daily goal</span>
+            <span className="text-sm text-text-secondary">{t('dailyGoal')}</span>
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => updateSettings({ dailyGoal: Math.max(1, (settings.dailyGoal ?? 8) - 1) })}
-                className="w-7 h-7 rounded-lg bg-surface-light text-text-secondary hover:text-text-primary flex items-center justify-center cursor-pointer press-effect"
-              >
-                −
-              </button>
+              <button onClick={() => updateSettings({ dailyGoal: Math.max(1, (settings.dailyGoal ?? 8) - 1) })} className="w-7 h-7 rounded-lg bg-surface-light text-text-secondary hover:text-text-primary flex items-center justify-center cursor-pointer press-effect">−</button>
               <span className="text-sm font-medium w-10 text-center">{settings.dailyGoal ?? 8}</span>
-              <button
-                onClick={() => updateSettings({ dailyGoal: Math.min(20, (settings.dailyGoal ?? 8) + 1) })}
-                className="w-7 h-7 rounded-lg bg-surface-light text-text-secondary hover:text-text-primary flex items-center justify-center cursor-pointer press-effect"
-              >
-                +
-              </button>
+              <button onClick={() => updateSettings({ dailyGoal: Math.min(20, (settings.dailyGoal ?? 8) + 1) })} className="w-7 h-7 rounded-lg bg-surface-light text-text-secondary hover:text-text-primary flex items-center justify-center cursor-pointer press-effect">+</button>
             </div>
           </div>
         </div>
       </GlassCard>
 
+      {/* Plant Species */}
+      <GlassCard className="p-4">
+        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">🌱 Plant Species</h3>
+        <div className="grid grid-cols-3 gap-2">
+          {PLANT_SPECIES.map((species) => {
+            const locked = species.unlockLevel > level;
+            const active = settings.selectedPlantSpecies === species.id;
+            return (
+              <button
+                key={species.id}
+                disabled={locked}
+                onClick={() => updateSettings({ selectedPlantSpecies: species.id })}
+                className={`flex flex-col items-center gap-1 p-2 rounded-lg text-xs transition-all cursor-pointer press-effect ${active ? 'bg-accent/20 ring-1 ring-accent/40' : 'bg-surface-light hover:bg-surface-lighter'} ${locked ? 'opacity-30 cursor-not-allowed' : ''}`}
+              >
+                <span className="text-xl">{species.stages.tree}</span>
+                <span className="text-[10px] text-text-secondary truncate w-full text-center">{species.name}</span>
+                {locked && <span className="text-[9px] text-text-muted">{t('level')}{species.unlockLevel}</span>}
+              </button>
+            );
+          })}
+        </div>
+      </GlassCard>
+
       {/* Environment */}
       <GlassCard className="p-4">
-        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">Environment</h3>
+        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">{t('environment')}</h3>
         <div className="grid grid-cols-2 gap-2">
           {ENVIRONMENTS.map((env) => {
             const locked = !unlockedEnvs.includes(env.id);
             const active = settings.selectedEnvironment === env.id;
             return (
-              <button
-                key={env.id}
-                disabled={locked}
-                onClick={() => updateSettings({ selectedEnvironment: env.id })}
-                className={`text-left p-2 rounded-lg text-sm transition-all cursor-pointer press-effect ${
-                  active ? 'bg-accent/20 ring-1 ring-accent/40' : 'bg-surface-light hover:bg-surface-lighter'
-                } ${locked ? 'opacity-40 cursor-not-allowed' : ''}`}
-              >
+              <button key={env.id} disabled={locked} onClick={() => updateSettings({ selectedEnvironment: env.id })} className={`text-left p-2 rounded-lg text-sm transition-all cursor-pointer press-effect ${active ? 'bg-accent/20 ring-1 ring-accent/40' : 'bg-surface-light hover:bg-surface-lighter'} ${locked ? 'opacity-40 cursor-not-allowed' : ''}`}>
                 <span>{env.emoji} {env.name}</span>
-                {locked && <span className="text-[10px] text-text-muted block">Lv.{env.unlockLevel}</span>}
+                {locked && <span className="text-[10px] text-text-muted block">{t('level')}{env.unlockLevel}</span>}
               </button>
             );
           })}
@@ -131,36 +202,21 @@ export function SettingsView() {
 
       {/* Sound */}
       <GlassCard className="p-4">
-        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">Sound</h3>
+        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">{t('sound')}</h3>
         <div className="flex flex-col gap-3">
-          <Toggle label="Sound enabled" value={settings.soundEnabled} onChange={(v) => updateSettings({ soundEnabled: v })} />
+          <Toggle label={t('soundEnabled')} value={settings.soundEnabled} onChange={(v) => updateSettings({ soundEnabled: v })} />
           <div className="flex items-center justify-between">
-            <span className="text-sm text-text-secondary">Volume</span>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.05"
-              value={settings.volume}
-              onChange={(e) => updateSettings({ volume: parseFloat(e.target.value) })}
-              className="w-24 accent-accent"
-            />
+            <span className="text-sm text-text-secondary">{t('volume')}</span>
+            <input type="range" min="0" max="1" step="0.05" value={settings.volume} onChange={(e) => updateSettings({ volume: parseFloat(e.target.value) })} className="w-24 accent-accent" />
           </div>
           <div className="grid grid-cols-2 gap-2 mt-1">
             {SOUND_PROFILES.map((s) => {
               const locked = !unlockedSounds.includes(s.id);
               const active = settings.selectedSound === s.id;
               return (
-                <button
-                  key={s.id}
-                  disabled={locked}
-                  onClick={() => updateSettings({ selectedSound: s.id })}
-                  className={`text-left p-2 rounded-lg text-sm transition-all cursor-pointer press-effect ${
-                    active ? 'bg-accent/20 ring-1 ring-accent/40' : 'bg-surface-light hover:bg-surface-lighter'
-                  } ${locked ? 'opacity-40 cursor-not-allowed' : ''}`}
-                >
+                <button key={s.id} disabled={locked} onClick={() => updateSettings({ selectedSound: s.id })} className={`text-left p-2 rounded-lg text-sm transition-all cursor-pointer press-effect ${active ? 'bg-accent/20 ring-1 ring-accent/40' : 'bg-surface-light hover:bg-surface-lighter'} ${locked ? 'opacity-40 cursor-not-allowed' : ''}`}>
                   <span>{s.emoji} {s.name}</span>
-                  {locked && <span className="text-[10px] text-text-muted block">Lv.{s.unlockLevel}</span>}
+                  {locked && <span className="text-[10px] text-text-muted block">{t('level')}{s.unlockLevel}</span>}
                 </button>
               );
             })}
@@ -170,30 +226,27 @@ export function SettingsView() {
 
       {/* Effects */}
       <GlassCard className="p-4">
-        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">Effects</h3>
-        <Toggle label="Particles" value={settings.particlesEnabled} onChange={(v) => updateSettings({ particlesEnabled: v })} />
+        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">{t('effects')}</h3>
+        <Toggle label={t('particles')} value={settings.particlesEnabled} onChange={(v) => updateSettings({ particlesEnabled: v })} />
       </GlassCard>
 
       {/* Data */}
       <GlassCard className="p-4">
-        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">Data</h3>
+        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">{t('data')}</h3>
         <div className="flex flex-col gap-2">
           <div className="flex gap-2">
-            <button onClick={handleExport} className="flex-1 bg-surface-light rounded-lg py-2 text-sm hover:bg-surface-lighter transition-colors cursor-pointer press-effect">
-              Export Data
-            </button>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="flex-1 bg-surface-light rounded-lg py-2 text-sm hover:bg-surface-lighter transition-colors cursor-pointer press-effect"
-            >
-              Import Data
-            </button>
+            <button onClick={handleExport} className="flex-1 bg-surface-light rounded-lg py-2 text-sm hover:bg-surface-lighter transition-colors cursor-pointer press-effect">{t('exportData')}</button>
+            <button onClick={() => fileInputRef.current?.click()} className="flex-1 bg-surface-light rounded-lg py-2 text-sm hover:bg-surface-lighter transition-colors cursor-pointer press-effect">{t('importData')}</button>
             <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
           </div>
           {exportMsg && <p className="text-xs text-break-accent text-center">{exportMsg}</p>}
-          <p className="text-xs text-text-muted">Level: {level} • Your progress is saved locally.</p>
+          <p className="text-xs text-text-muted">{t('level')} {level}</p>
         </div>
       </GlassCard>
+
+      <p className="text-[10px] text-text-muted text-center pb-4">
+        Focus Universe v1.0 • Space: start/pause • R: reset • S: skip
+      </p>
     </div>
   );
 }

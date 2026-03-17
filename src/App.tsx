@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePersistence } from './hooks/use-persistence.ts';
 import { AnimatedBackground } from './components/effects/AnimatedBackground.tsx';
@@ -9,12 +9,15 @@ import { StatsView } from './features/stats/StatsView.tsx';
 import { TaskView } from './features/tasks/TaskView.tsx';
 import { QuestPanel } from './features/quests/QuestPanel.tsx';
 import { AchievementsView } from './features/achievements/AchievementsView.tsx';
+import { MusicPlayer } from './features/music/MusicPlayer.tsx';
 import { SettingsView } from './features/settings/SettingsView.tsx';
 import { Modal } from './components/ui/Modal.tsx';
 import { audioEngine } from './core/audio-engine.ts';
 import { NativeService } from './services/native.ts';
+import { THEMES, applyTheme } from './core/themes.ts';
+import { useSettingsStore } from './store/settings-store.ts';
 
-type Panel = 'tasks' | 'garden' | 'stats' | 'quests' | 'achievements' | 'settings' | null;
+type Panel = 'tasks' | 'garden' | 'stats' | 'quests' | 'achievements' | 'music' | 'settings' | null;
 
 const navItems: { id: Panel; label: string; icon: string }[] = [
   { id: 'tasks', label: 'Tasks', icon: '📋' },
@@ -22,6 +25,7 @@ const navItems: { id: Panel; label: string; icon: string }[] = [
   { id: 'stats', label: 'Stats', icon: '📊' },
   { id: 'quests', label: 'Quests', icon: '🏆' },
   { id: 'achievements', label: 'Achievements', icon: '🎖️' },
+  { id: 'music', label: 'Music', icon: '🎵' },
   { id: 'settings', label: 'Settings', icon: '⚙️' },
 ];
 
@@ -31,6 +35,7 @@ const panelTitles: Record<string, string> = {
   stats: 'Statistics',
   quests: 'Quests',
   achievements: 'Achievements',
+  music: 'Lo-fi Music',
   settings: 'Settings',
 };
 
@@ -60,6 +65,7 @@ function PanelContent({ panel }: { panel: Panel }) {
     case 'stats': return <StatsView />;
     case 'quests': return <QuestPanel />;
     case 'achievements': return <AchievementsView />;
+    case 'music': return <MusicPlayer />;
     case 'settings': return <SettingsView />;
     default: return null;
   }
@@ -68,6 +74,18 @@ function PanelContent({ panel }: { panel: Panel }) {
 export default function App() {
   const ready = usePersistence();
   const [activePanel, setActivePanel] = useState<Panel>(null);
+  const themeId = useSettingsStore((s) => s.settings.themeId);
+
+  useEffect(() => {
+    const theme = THEMES.find((t) => t.id === themeId) ?? THEMES[0];
+    applyTheme(theme);
+  }, [themeId]);
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+  }, []);
 
   const togglePanel = useCallback((panel: Panel) => {
     audioEngine.playClick();
@@ -83,19 +101,18 @@ export default function App() {
       <ParticleCanvas />
 
       <div className="relative flex flex-col h-full" style={{ zIndex: 2 }}>
-        {/* Header — safe area aware */}
         <header className="flex items-center justify-between px-4 sm:px-6 pt-3 sm:pt-5 pb-1 sm:pb-2">
           <h1 className="text-sm sm:text-base font-semibold tracking-wide">
             <span className="text-accent text-glow-accent">Focus</span>{' '}
             <span className="text-text-primary">Universe</span>
           </h1>
-          <nav className="flex items-center gap-0.5 sm:gap-1">
+          <nav className="flex items-center gap-0.5">
             {navItems.map((item) => (
               <motion.button
                 key={item.id}
                 whileTap={{ scale: 0.85 }}
                 onClick={() => togglePanel(item.id)}
-                className={`relative p-2.5 sm:p-2 rounded-xl text-sm transition-all cursor-pointer active:bg-accent/10 ${
+                className={`relative p-2 sm:p-2 rounded-xl text-sm transition-all cursor-pointer active:bg-accent/10 ${
                   activePanel === item.id ? 'bg-accent/20' : ''
                 }`}
                 aria-label={item.label}
@@ -104,7 +121,7 @@ export default function App() {
                 {activePanel === item.id && (
                   <motion.div
                     layoutId="navIndicator"
-                    className="absolute inset-x-2 -bottom-0.5 h-0.5 bg-accent rounded-full"
+                    className="absolute inset-x-1 -bottom-0.5 h-0.5 bg-accent rounded-full"
                   />
                 )}
               </motion.button>
@@ -112,7 +129,6 @@ export default function App() {
           </nav>
         </header>
 
-        {/* Center area: Timer — reduced padding in landscape */}
         <main className="flex flex-1 items-center justify-center px-3 sm:px-4 pb-2 sm:pb-4 landscape:pb-1 overflow-hidden">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -125,7 +141,6 @@ export default function App() {
         </main>
       </div>
 
-      {/* Panels */}
       <Modal
         open={activePanel !== null}
         onClose={() => setActivePanel(null)}

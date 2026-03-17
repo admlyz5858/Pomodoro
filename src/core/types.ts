@@ -23,6 +23,8 @@ export interface TimerSettings {
   soundEnabled: boolean;
   particlesEnabled: boolean;
   dailyGoal: number;
+  themeId: string;
+  selectedPlantSpecies: string;
 }
 
 export interface Session {
@@ -96,6 +98,8 @@ export const DEFAULT_SETTINGS: TimerSettings = {
   soundEnabled: true,
   particlesEnabled: true,
   dailyGoal: 8,
+  themeId: 'midnight',
+  selectedPlantSpecies: 'oak',
 };
 
 export const PLANT_STAGE_THRESHOLDS: Record<PlantStage, number> = {
