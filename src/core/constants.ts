@@ -4,7 +4,7 @@ export interface Environment {
   emoji: string;
   images: string[];
   unlockLevel: number;
-  particleType: 'fireflies' | 'dust' | 'snow' | 'rain' | 'stars';
+  particleType: 'fireflies' | 'dust' | 'snow' | 'rain' | 'stars' | 'fog' | 'leaves' | 'embers';
   overlayColor: string;
 }
 
@@ -28,7 +28,7 @@ export const ENVIRONMENTS: Environment[] = [
     ],
     unlockLevel: 1,
     particleType: 'fireflies',
-    overlayColor: 'rgba(0, 30, 10, 0.5)',
+    overlayColor: 'rgba(5, 20, 10, 0.55)',
   },
   {
     id: 'rain',
@@ -41,7 +41,20 @@ export const ENVIRONMENTS: Environment[] = [
     ],
     unlockLevel: 1,
     particleType: 'rain',
-    overlayColor: 'rgba(10, 15, 30, 0.55)',
+    overlayColor: 'rgba(8, 12, 24, 0.55)',
+  },
+  {
+    id: 'rainy-forest',
+    name: 'Rainy Forest',
+    emoji: '🌧️🌲',
+    images: [
+      'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=1920&q=80',
+      'https://images.unsplash.com/photo-1425913397330-cf8af2ff40a1?w=1920&q=80',
+      'https://images.unsplash.com/photo-1507041957456-9c397ce39c97?w=1920&q=80',
+    ],
+    unlockLevel: 2,
+    particleType: 'rain',
+    overlayColor: 'rgba(5, 15, 10, 0.6)',
   },
   {
     id: 'ocean',
@@ -54,7 +67,20 @@ export const ENVIRONMENTS: Environment[] = [
     ],
     unlockLevel: 2,
     particleType: 'dust',
-    overlayColor: 'rgba(5, 15, 30, 0.5)',
+    overlayColor: 'rgba(5, 12, 25, 0.5)',
+  },
+  {
+    id: 'misty-lake',
+    name: 'Misty Lake',
+    emoji: '🌫️',
+    images: [
+      'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&q=80',
+      'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1920&q=80',
+      'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=1920&q=80',
+    ],
+    unlockLevel: 3,
+    particleType: 'fog',
+    overlayColor: 'rgba(10, 15, 20, 0.5)',
   },
   {
     id: 'mountains',
@@ -67,7 +93,33 @@ export const ENVIRONMENTS: Environment[] = [
     ],
     unlockLevel: 3,
     particleType: 'dust',
-    overlayColor: 'rgba(10, 10, 25, 0.45)',
+    overlayColor: 'rgba(8, 10, 20, 0.45)',
+  },
+  {
+    id: 'autumn',
+    name: 'Autumn Path',
+    emoji: '🍂',
+    images: [
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&q=80',
+      'https://images.unsplash.com/photo-1476820865390-c52aeebb9891?w=1920&q=80',
+      'https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=1920&q=80',
+    ],
+    unlockLevel: 4,
+    particleType: 'leaves',
+    overlayColor: 'rgba(15, 10, 5, 0.45)',
+  },
+  {
+    id: 'cabin',
+    name: 'Cozy Cabin',
+    emoji: '🏡',
+    images: [
+      'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&q=80',
+      'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=1920&q=80',
+      'https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=1920&q=80',
+    ],
+    unlockLevel: 4,
+    particleType: 'embers',
+    overlayColor: 'rgba(15, 10, 5, 0.5)',
   },
   {
     id: 'night',
@@ -78,9 +130,9 @@ export const ENVIRONMENTS: Environment[] = [
       'https://images.unsplash.com/photo-1475274047050-1d0c55b0b264?w=1920&q=80',
       'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=1920&q=80',
     ],
-    unlockLevel: 4,
+    unlockLevel: 5,
     particleType: 'stars',
-    overlayColor: 'rgba(5, 5, 20, 0.4)',
+    overlayColor: 'rgba(3, 3, 15, 0.4)',
   },
   {
     id: 'sunset',
@@ -93,7 +145,7 @@ export const ENVIRONMENTS: Environment[] = [
     ],
     unlockLevel: 5,
     particleType: 'dust',
-    overlayColor: 'rgba(30, 10, 5, 0.4)',
+    overlayColor: 'rgba(20, 8, 5, 0.4)',
   },
   {
     id: 'snow',
@@ -106,7 +158,33 @@ export const ENVIRONMENTS: Environment[] = [
     ],
     unlockLevel: 6,
     particleType: 'snow',
-    overlayColor: 'rgba(15, 20, 35, 0.4)',
+    overlayColor: 'rgba(12, 16, 28, 0.4)',
+  },
+  {
+    id: 'japanese',
+    name: 'Japanese Garden',
+    emoji: '⛩️',
+    images: [
+      'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1920&q=80',
+      'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=1920&q=80',
+      'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1920&q=80',
+    ],
+    unlockLevel: 7,
+    particleType: 'leaves',
+    overlayColor: 'rgba(10, 12, 8, 0.45)',
+  },
+  {
+    id: 'northern-lights',
+    name: 'Northern Lights',
+    emoji: '💚',
+    images: [
+      'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1920&q=80',
+      'https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=1920&q=80',
+      'https://images.unsplash.com/photo-1579033461380-adb47c3eb938?w=1920&q=80',
+    ],
+    unlockLevel: 8,
+    particleType: 'stars',
+    overlayColor: 'rgba(3, 8, 15, 0.35)',
   },
 ];
 
@@ -114,41 +192,45 @@ export const SOUND_PROFILES: SoundProfile[] = [
   { id: 'rain', name: 'Rain', emoji: '🌧️', category: 'focus', unlockLevel: 1 },
   { id: 'forest', name: 'Forest', emoji: '🌲', category: 'focus', unlockLevel: 1 },
   { id: 'wind', name: 'Wind', emoji: '💨', category: 'focus', unlockLevel: 2 },
-  { id: 'waves', name: 'Ocean Waves', emoji: '🌊', category: 'focus', unlockLevel: 3 },
+  { id: 'waves', name: 'Waves', emoji: '🌊', category: 'focus', unlockLevel: 3 },
   { id: 'fire', name: 'Campfire', emoji: '🔥', category: 'focus', unlockLevel: 4 },
-  { id: 'piano', name: 'Soft Piano', emoji: '🎹', category: 'break', unlockLevel: 1 },
+  { id: 'piano', name: 'Piano', emoji: '🎹', category: 'break', unlockLevel: 1 },
   { id: 'lofi', name: 'Lo-fi', emoji: '🎵', category: 'break', unlockLevel: 2 },
   { id: 'ambient', name: 'Ambient', emoji: '✨', category: 'break', unlockLevel: 3 },
 ];
 
 export const ENCOURAGING_MESSAGES = {
   focus: [
-    "Deep work unlocks deep results ✨",
-    "You're building something amazing 🚀",
-    "Stay in the zone. You've got this 💪",
-    "Every minute of focus compounds 📈",
-    "Your future self will thank you 🌟",
-    "Embrace the flow state 🌊",
-    "Great things take focused effort ⭐",
-    "You're making real progress 🎯",
+    "Deep work unlocks deep results",
+    "You're building something amazing",
+    "Stay in the zone",
+    "Every minute of focus compounds",
+    "Your future self will thank you",
+    "Embrace the flow state",
+    "Great things take focused effort",
+    "You're making real progress",
+    "Clarity comes through focus",
+    "One session at a time",
   ],
   break: [
-    "You earned this rest 🌿",
-    "Breathe. Recharge. Come back stronger 🧘",
-    "A rested mind is a powerful mind 🧠",
-    "Take a moment to appreciate your work 🌸",
-    "Stretch, breathe, smile 😊",
-    "Your brain is consolidating what you learned 💡",
+    "You earned this rest",
+    "Breathe. Recharge. Come back stronger.",
+    "A rested mind is a powerful mind",
+    "Take a moment to appreciate your work",
+    "Stretch, breathe, relax",
+    "Your brain is consolidating what you learned",
+    "Rest is part of the process",
+    "Enjoy the calm before the next wave",
   ],
   streak: [
-    "🔥 Unstoppable! {n} day streak!",
-    "🔥 On fire! {n} days and counting!",
-    "🔥 Legendary focus! {n} day streak!",
+    "Unstoppable! {n} day streak!",
+    "On fire! {n} days and counting!",
+    "Legendary focus! {n} day streak!",
   ],
   levelUp: [
-    "⚡ Level {n}! New horizons unlocked!",
-    "🌟 Level {n}! You're evolving!",
-    "✨ Level {n}! The universe expands!",
+    "Level {n}! New horizons unlocked!",
+    "Level {n}! You're evolving!",
+    "Level {n}! The universe expands!",
   ],
 };
 

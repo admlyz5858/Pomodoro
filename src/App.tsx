@@ -14,7 +14,7 @@ import { SettingsView } from './features/settings/SettingsView.tsx';
 import { Modal } from './components/ui/Modal.tsx';
 import { audioEngine } from './core/audio-engine.ts';
 import { NativeService } from './services/native.ts';
-import { THEMES, applyTheme } from './core/themes.ts';
+import { getThemeById, applyTheme } from './core/themes.ts';
 import { useSettingsStore } from './store/settings-store.ts';
 
 type Panel = 'tasks' | 'garden' | 'stats' | 'quests' | 'achievements' | 'music' | 'settings' | null;
@@ -77,7 +77,7 @@ export default function App() {
   const themeId = useSettingsStore((s) => s.settings.themeId);
 
   useEffect(() => {
-    const theme = THEMES.find((t) => t.id === themeId) ?? THEMES[0];
+    const theme = getThemeById(themeId);
     applyTheme(theme);
   }, [themeId]);
 
