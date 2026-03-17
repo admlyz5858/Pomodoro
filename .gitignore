@@ -26,7 +26,10 @@ tsconfig.app.tsbuildinfo
 dist/
 *.tar.gz
 *.zip
+
+# Ignore APKs everywhere except apk/ folder
 *.apk
+!apk/*.apk
 
 # Android build artifacts
 android/app/build/
