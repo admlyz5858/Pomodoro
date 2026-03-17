@@ -212,3 +212,11 @@ input, textarea {
 .press-effect:active {
   transform: scale(0.95);
 }
+
+/* Landscape utilities */
+@media (orientation: landscape) {
+  .landscape\:pb-1 { padding-bottom: 0.25rem; }
+  .landscape\:pt-1 { padding-top: 0.25rem; }
+  .landscape\:hidden { display: none; }
+  .landscape\:gap-2 { gap: 0.5rem; }
+}

@@ -22,6 +22,7 @@ export interface TimerSettings {
   volume: number;
   soundEnabled: boolean;
   particlesEnabled: boolean;
+  dailyGoal: number;
 }
 
 export interface Session {
@@ -94,6 +95,7 @@ export const DEFAULT_SETTINGS: TimerSettings = {
   volume: 0.5,
   soundEnabled: true,
   particlesEnabled: true,
+  dailyGoal: 8,
 };
 
 export const PLANT_STAGE_THRESHOLDS: Record<PlantStage, number> = {

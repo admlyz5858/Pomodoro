@@ -8,18 +8,20 @@ import { GardenView } from './features/garden/GardenView.tsx';
 import { StatsView } from './features/stats/StatsView.tsx';
 import { TaskView } from './features/tasks/TaskView.tsx';
 import { QuestPanel } from './features/quests/QuestPanel.tsx';
+import { AchievementsView } from './features/achievements/AchievementsView.tsx';
 import { SettingsView } from './features/settings/SettingsView.tsx';
 import { Modal } from './components/ui/Modal.tsx';
 import { audioEngine } from './core/audio-engine.ts';
 import { NativeService } from './services/native.ts';
 
-type Panel = 'tasks' | 'garden' | 'stats' | 'quests' | 'settings' | null;
+type Panel = 'tasks' | 'garden' | 'stats' | 'quests' | 'achievements' | 'settings' | null;
 
 const navItems: { id: Panel; label: string; icon: string }[] = [
   { id: 'tasks', label: 'Tasks', icon: '📋' },
   { id: 'garden', label: 'Garden', icon: '🌿' },
   { id: 'stats', label: 'Stats', icon: '📊' },
   { id: 'quests', label: 'Quests', icon: '🏆' },
+  { id: 'achievements', label: 'Achievements', icon: '🎖️' },
   { id: 'settings', label: 'Settings', icon: '⚙️' },
 ];
 
@@ -28,6 +30,7 @@ const panelTitles: Record<string, string> = {
   garden: 'Garden',
   stats: 'Statistics',
   quests: 'Quests',
+  achievements: 'Achievements',
   settings: 'Settings',
 };
 
@@ -56,6 +59,7 @@ function PanelContent({ panel }: { panel: Panel }) {
     case 'garden': return <GardenView />;
     case 'stats': return <StatsView />;
     case 'quests': return <QuestPanel />;
+    case 'achievements': return <AchievementsView />;
     case 'settings': return <SettingsView />;
     default: return null;
   }
@@ -108,8 +112,8 @@ export default function App() {
           </nav>
         </header>
 
-        {/* Center area: Timer */}
-        <main className="flex flex-1 items-center justify-center px-3 sm:px-4 pb-4">
+        {/* Center area: Timer — reduced padding in landscape */}
+        <main className="flex flex-1 items-center justify-center px-3 sm:px-4 pb-2 sm:pb-4 landscape:pb-1 overflow-hidden">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

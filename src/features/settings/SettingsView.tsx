@@ -84,6 +84,24 @@ export function SettingsView() {
           <DurationInput label="Long Break" value={settings.longBreakDuration} onChange={(v) => updateSettings({ longBreakDuration: v })} />
           <Toggle label="Auto-start breaks" value={settings.autoStartBreaks} onChange={(v) => updateSettings({ autoStartBreaks: v })} />
           <Toggle label="Auto-start focus" value={settings.autoStartFocus} onChange={(v) => updateSettings({ autoStartFocus: v })} />
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-text-secondary">Daily goal</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => updateSettings({ dailyGoal: Math.max(1, (settings.dailyGoal ?? 8) - 1) })}
+                className="w-7 h-7 rounded-lg bg-surface-light text-text-secondary hover:text-text-primary flex items-center justify-center cursor-pointer press-effect"
+              >
+                −
+              </button>
+              <span className="text-sm font-medium w-10 text-center">{settings.dailyGoal ?? 8}</span>
+              <button
+                onClick={() => updateSettings({ dailyGoal: Math.min(20, (settings.dailyGoal ?? 8) + 1) })}
+                className="w-7 h-7 rounded-lg bg-surface-light text-text-secondary hover:text-text-primary flex items-center justify-center cursor-pointer press-effect"
+              >
+                +
+              </button>
+            </div>
+          </div>
         </div>
       </GlassCard>
 
