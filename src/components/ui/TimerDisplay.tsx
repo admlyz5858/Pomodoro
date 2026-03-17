@@ -11,7 +11,7 @@ export function TimerDisplay({ remainingMs, isRunning }: TimerDisplayProps) {
 
   return (
     <span
-      className={`text-[5rem] leading-none font-extralight tracking-tight text-text-primary tabular-nums select-none transition-all duration-300 ${
+      className={`text-[3.5rem] sm:text-[5rem] leading-none font-extralight tracking-tight text-text-primary tabular-nums select-none transition-all duration-300 ${
         isLast10 ? 'text-glow-accent scale-105' : ''
       }`}
       style={{ fontVariantNumeric: 'tabular-nums' }}

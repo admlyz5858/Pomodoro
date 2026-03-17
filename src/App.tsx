@@ -11,6 +11,7 @@ import { QuestPanel } from './features/quests/QuestPanel.tsx';
 import { SettingsView } from './features/settings/SettingsView.tsx';
 import { Modal } from './components/ui/Modal.tsx';
 import { audioEngine } from './core/audio-engine.ts';
+import { NativeService } from './services/native.ts';
 
 type Panel = 'tasks' | 'garden' | 'stats' | 'quests' | 'settings' | null;
 
@@ -66,6 +67,7 @@ export default function App() {
 
   const togglePanel = useCallback((panel: Panel) => {
     audioEngine.playClick();
+    NativeService.vibrate('light');
     setActivePanel((prev) => (prev === panel ? null : panel));
   }, []);
 
@@ -73,31 +75,26 @@ export default function App() {
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden">
-      {/* Immersive background layers */}
       <AnimatedBackground />
       <ParticleCanvas />
 
-      {/* Main content */}
       <div className="relative flex flex-col h-full" style={{ zIndex: 2 }}>
-        {/* Header */}
-        <header className="flex items-center justify-between px-6 pt-5 pb-2">
-          <h1 className="text-base font-semibold tracking-wide">
+        {/* Header — safe area aware */}
+        <header className="flex items-center justify-between px-4 sm:px-6 pt-3 sm:pt-5 pb-1 sm:pb-2">
+          <h1 className="text-sm sm:text-base font-semibold tracking-wide">
             <span className="text-accent text-glow-accent">Focus</span>{' '}
             <span className="text-text-primary">Universe</span>
           </h1>
-          <div className="flex items-center gap-1">
+          <nav className="flex items-center gap-0.5 sm:gap-1">
             {navItems.map((item) => (
               <motion.button
                 key={item.id}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileTap={{ scale: 0.85 }}
                 onClick={() => togglePanel(item.id)}
-                className={`relative p-2 rounded-xl text-sm transition-all cursor-pointer ${
-                  activePanel === item.id
-                    ? 'bg-accent/20'
-                    : 'hover:bg-white/5'
+                className={`relative p-2.5 sm:p-2 rounded-xl text-sm transition-all cursor-pointer active:bg-accent/10 ${
+                  activePanel === item.id ? 'bg-accent/20' : ''
                 }`}
-                title={item.label}
+                aria-label={item.label}
               >
                 {item.icon}
                 {activePanel === item.id && (
@@ -108,22 +105,23 @@ export default function App() {
                 )}
               </motion.button>
             ))}
-          </div>
+          </nav>
         </header>
 
         {/* Center area: Timer */}
-        <main className="flex flex-1 items-center justify-center px-4 pb-4">
+        <main className="flex flex-1 items-center justify-center px-3 sm:px-4 pb-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6, ease: 'easeOut' }}
+            className="w-full"
           >
             <TimerView />
           </motion.div>
         </main>
       </div>
 
-      {/* Slide-in panels */}
+      {/* Panels */}
       <Modal
         open={activePanel !== null}
         onClose={() => setActivePanel(null)}

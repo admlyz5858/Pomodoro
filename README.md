@@ -163,18 +163,48 @@ VITE_OPENAI_API_KEY=your-key-here npm run dev
 
 The app works fully without it — the offline fallback parses natural language and creates sensible task breakdowns automatically.
 
-### Mobile (Capacitor)
+### Mobile App (Android)
 
-A `capacitor.config.ts` is included for Android/iOS builds:
+The project includes a full Android project powered by Capacitor. Native features:
+
+- **Haptic feedback** on all timer actions (start, pause, skip, reset)
+- **Local notifications** — timer running notification + completion alerts
+- **Screen wake lock** — screen stays on during focus sessions
+- **Status bar** — translucent dark status bar matching the app theme
+- **Notification channel** — dedicated "Timer" channel for Android
+- **Portrait lock** — locked to portrait orientation
+- **Back button** — minimizes app instead of closing
+
+#### Build APK
 
 ```bash
-npm install @capacitor/core @capacitor/cli
-npx cap init
-npx cap add android
-npm run build
-npx cap sync
-npx cap open android
+# One-command build (builds web → syncs → opens Android Studio)
+npm run android
+
+# Or step by step:
+npm run build              # Build web assets
+npm run cap:sync           # Sync to Android project
+npm run cap:open           # Open in Android Studio
+
+# Build APK from command line (requires Android SDK)
+cd android && ./gradlew assembleDebug
+# APK: android/app/build/outputs/apk/debug/app-debug.apk
 ```
+
+#### Requirements for Android Build
+
+- Java 17+ (JDK)
+- Android SDK (API 35)
+- Android Build Tools 35.0.1
+- Or simply: Android Studio (handles all SDK setup)
+
+#### PWA (No Install Required)
+
+The app also works as a Progressive Web App. Install it directly from the browser:
+
+1. Open the app URL in Chrome/Edge
+2. Click "Install" in the address bar (or menu → "Add to Home Screen")
+3. The app runs fullscreen with offline support
 
 ## Testing
 

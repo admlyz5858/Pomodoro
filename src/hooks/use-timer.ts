@@ -5,6 +5,8 @@ import { useSettingsStore } from '../store/settings-store.ts';
 import { useSessionStore } from '../store/session-store.ts';
 import { useGameStore } from '../store/game-store.ts';
 import { useTaskStore } from '../store/task-store.ts';
+import { NativeService } from '../services/native.ts';
+import { formatMs } from '../core/types.ts';
 import type { Session, TimerMode } from '../core/types.ts';
 
 export function useTimer() {
@@ -54,6 +56,16 @@ export function useTimer() {
       status: 'idle',
     });
 
+    NativeService.vibrate('success');
+    NativeService.cancelTimerNotification();
+    NativeService.keepScreenOn(false);
+
+    const label = mode === 'focus' ? 'Focus session complete!' : 'Break is over!';
+    const body = mode === 'focus'
+      ? `Great work! +${xpEarned} XP earned. Time for a break.`
+      : 'Ready to focus again?';
+    NativeService.showCompletionNotification(label, body);
+
     if (
       (mode === 'focus' && settings.autoStartBreaks) ||
       (mode !== 'focus' && settings.autoStartFocus)
@@ -82,30 +94,54 @@ export function useTimer() {
       const alreadyElapsed = totalMs - remainingMs;
       sessionStartRef.current = sessionStartRef.current || Date.now();
       engine.start(totalMs, alreadyElapsed);
+      NativeService.keepScreenOn(true);
+      const modeLabel = mode === 'focus' ? 'Focusing' : 'Break';
+      NativeService.showTimerNotification(
+        `${modeLabel} — ${formatMs(remainingMs)}`,
+        'Focus Universe is running',
+      );
     } else if (status === 'paused') {
       engine.pause();
+      NativeService.cancelTimerNotification();
+      NativeService.keepScreenOn(false);
     } else {
       engine.stop();
+      NativeService.cancelTimerNotification();
+      NativeService.keepScreenOn(false);
     }
   }, [status]);
 
   const start = useCallback(() => {
     sessionStartRef.current = Date.now();
+    NativeService.vibrate('light');
     setStatus('running');
   }, [setStatus]);
 
-  const pause = useCallback(() => setStatus('paused'), [setStatus]);
-  const resume = useCallback(() => setStatus('running'), [setStatus]);
+  const pause = useCallback(() => {
+    NativeService.vibrate('light');
+    setStatus('paused');
+  }, [setStatus]);
+
+  const resume = useCallback(() => {
+    NativeService.vibrate('light');
+    setStatus('running');
+  }, [setStatus]);
 
   const resetTimer = useCallback(() => {
     engineRef.current?.stop();
     sessionStartRef.current = 0;
+    NativeService.vibrate('light');
+    NativeService.cancelTimerNotification();
+    NativeService.keepScreenOn(false);
     reset(mode, settings);
   }, [reset, mode, settings]);
 
   const skip = useCallback(() => {
     engineRef.current?.stop();
     sessionStartRef.current = 0;
+    NativeService.vibrate('medium');
+    NativeService.cancelTimerNotification();
+    NativeService.keepScreenOn(false);
     let newSessions = sessionsCompleted;
     if (mode === 'focus') {
       newSessions = sessionsCompleted + 1;
@@ -119,6 +155,7 @@ export function useTimer() {
   const switchMode = useCallback((newMode: TimerMode) => {
     engineRef.current?.stop();
     sessionStartRef.current = 0;
+    NativeService.vibrate('light');
     const dur = getDurationForMode(newMode, settings);
     useTimerStore.setState({ mode: newMode, remainingMs: dur, totalMs: dur, status: 'idle' });
   }, [settings]);

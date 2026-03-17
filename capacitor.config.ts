@@ -7,18 +7,33 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: 'https',
   },
+  android: {
+    backgroundColor: '#0a0a12',
+    allowMixedContent: true,
+    captureInput: true,
+    webContentsDebuggingEnabled: false,
+  },
   plugins: {
-    LocalNotifications: {
-      smallIcon: 'ic_stat_icon',
-      iconColor: '#8b5cf6',
+    SplashScreen: {
+      launchAutoHide: true,
+      launchShowDuration: 2000,
+      launchFadeOutDuration: 500,
+      backgroundColor: '#0a0a12',
+      showSpinner: false,
+      androidScaleType: 'CENTER_CROP',
     },
-    BackgroundRunner: {
-      label: 'com.focusuniverse.background',
-      src: 'background.js',
-      event: 'timerTick',
-      repeat: true,
-      interval: 1,
-      autoStart: true,
+    StatusBar: {
+      style: 'DARK',
+      backgroundColor: '#0a0a12',
+      overlaysWebView: true,
+    },
+    LocalNotifications: {
+      smallIcon: 'ic_stat_focus',
+      iconColor: '#8b5cf6',
+      sound: 'notification.wav',
+    },
+    CapacitorHttp: {
+      enabled: true,
     },
   },
 };
