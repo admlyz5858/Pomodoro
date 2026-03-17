@@ -1,5 +1,5 @@
 import { addDays, formatISO } from 'date-fns'
-import { AppState, FocusSession, GameState, Quest } from '../types'
+import type { AppState, FocusSession, GameState, Quest } from '../types'
 import { isConsecutiveDay, isSameDay, toISODate } from './utils'
 
 export const createDailyQuests = (seed = new Date()): Quest[] => [

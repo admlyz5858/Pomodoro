@@ -1,4 +1,4 @@
-import { EnvironmentAsset, AudioTrack } from '../types'
+import type { EnvironmentAsset, AudioTrack } from '../types'
 
 export const ENVIRONMENTS: EnvironmentAsset[] = [
   {

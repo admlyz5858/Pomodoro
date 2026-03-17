@@ -15,7 +15,7 @@ import { loadState, saveState } from './lib/db'
 import { applySessionResult, createInitialState } from './lib/gameEngine'
 import { formatClock, randomOf } from './lib/utils'
 import { exportTimerVideo } from './lib/videoExport'
-import { AppState, FocusSession, TimerMode } from './types'
+import type { AppState, FocusSession, TimerMode } from './types'
 
 const FIVE_MINUTES = 5 * 60 * 1000
 
@@ -40,7 +40,6 @@ const notifyModeSwitch = async (nextMode: TimerMode) => {
       icon: '/favicon.svg',
       badge: '/favicon.svg',
       tag: 'focus-universe-mode-switch',
-      renotify: true,
     })
   } else {
     new Notification(title)

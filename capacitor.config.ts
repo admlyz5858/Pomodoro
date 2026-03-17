@@ -4,7 +4,6 @@ const config: CapacitorConfig = {
   appId: 'com.focusuniverse.app',
   appName: 'Focus Universe',
   webDir: 'dist',
-  bundledWebRuntime: false,
   plugins: {
     SplashScreen: {
       launchShowDuration: 600,

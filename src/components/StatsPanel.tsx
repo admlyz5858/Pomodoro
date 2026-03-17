@@ -1,5 +1,5 @@
 import { eachDayOfInterval, format, startOfDay, subDays } from 'date-fns'
-import { FocusSession } from '../types'
+import type { FocusSession } from '../types'
 import { GlassCard } from './GlassCard'
 import { Heatmap } from './Heatmap'
 

@@ -1,5 +1,5 @@
 import { openDB } from 'idb'
-import { AppState } from '../types'
+import type { AppState } from '../types'
 import { createInitialState } from './gameEngine'
 
 const DB_NAME = 'focus-universe'

@@ -1,6 +1,6 @@
 import { Howl, Howler } from 'howler'
 import { AUDIO_TRACKS } from '../data/media'
-import { TimerMode } from '../types'
+import type { TimerMode } from '../types'
 
 export class AudioEngine {
   private activeHowl: Howl | null = null

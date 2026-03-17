@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import { TimerMode } from '../types'
+import { useEffect, useState } from 'react'
+import type { TimerMode } from '../types'
 
 interface PomodoroOptions {
   focusSeconds: number
@@ -21,26 +21,7 @@ export const usePomodoro = ({
   const [mode, setMode] = useState<TimerMode>('focus')
   const [isRunning, setIsRunning] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(focusSeconds)
-
-  const totalRef = useRef(focusSeconds)
-
-  useEffect(() => {
-    if (mode === 'focus') {
-      totalRef.current = focusSeconds
-      if (!isRunning) {
-        setSecondsLeft(focusSeconds)
-      }
-    }
-  }, [focusSeconds, isRunning, mode])
-
-  useEffect(() => {
-    if (mode === 'break') {
-      totalRef.current = breakSeconds
-      if (!isRunning) {
-        setSecondsLeft(breakSeconds)
-      }
-    }
-  }, [breakSeconds, isRunning, mode])
+  const totalSeconds = mode === 'focus' ? focusSeconds : breakSeconds
 
   useEffect(() => {
     if (!isRunning) {
@@ -51,13 +32,12 @@ export const usePomodoro = ({
       setSecondsLeft((previous) => {
         const next = previous - 1
         const resolved = Math.max(0, next)
-        onSecond?.(resolved, totalRef.current, mode)
+        onSecond?.(resolved, totalSeconds, mode)
 
         if (next <= 0) {
           onFinished?.(mode)
           const nextMode: TimerMode = mode === 'focus' ? 'break' : 'focus'
           const nextTotal = nextMode === 'focus' ? focusSeconds : breakSeconds
-          totalRef.current = nextTotal
           setMode(nextMode)
           onModeSwitch?.(nextMode)
 
@@ -73,7 +53,7 @@ export const usePomodoro = ({
     }, 1000)
 
     return () => window.clearInterval(interval)
-  }, [autoStartBreak, breakSeconds, focusSeconds, isRunning, mode, onFinished, onModeSwitch, onSecond])
+  }, [autoStartBreak, breakSeconds, focusSeconds, isRunning, mode, onFinished, onModeSwitch, onSecond, totalSeconds])
 
   const start = () => setIsRunning(true)
   const pause = () => setIsRunning(false)
@@ -81,7 +61,6 @@ export const usePomodoro = ({
   const reset = (nextMode: TimerMode = mode) => {
     setMode(nextMode)
     const total = nextMode === 'focus' ? focusSeconds : breakSeconds
-    totalRef.current = total
     setSecondsLeft(total)
     setIsRunning(false)
   }
@@ -90,7 +69,6 @@ export const usePomodoro = ({
     const nextMode: TimerMode = mode === 'focus' ? 'break' : 'focus'
     setMode(nextMode)
     const total = nextMode === 'focus' ? focusSeconds : breakSeconds
-    totalRef.current = total
     setSecondsLeft(total)
     onModeSwitch?.(nextMode)
   }
@@ -98,7 +76,6 @@ export const usePomodoro = ({
   const setModeManually = (nextMode: TimerMode) => {
     setMode(nextMode)
     const total = nextMode === 'focus' ? focusSeconds : breakSeconds
-    totalRef.current = total
     setSecondsLeft(total)
     onModeSwitch?.(nextMode)
   }
@@ -107,7 +84,7 @@ export const usePomodoro = ({
     mode,
     isRunning,
     secondsLeft,
-    totalSeconds: totalRef.current,
+    totalSeconds,
     start,
     pause,
     reset,

@@ -1,5 +1,5 @@
 import { addMinutes, format, set } from 'date-fns'
-import { AiPlan, PlannedTask } from '../types'
+import type { AiPlan, PlannedTask } from '../types'
 
 const DEFAULT_FOCUS_MINUTES = 25
 
