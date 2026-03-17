@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { TimerState, TimerMode, TimerStatus } from '../core/types.ts';
+import type { TimerState, TimerMode, TimerStatus, TimerSettings } from '../core/types.ts';
 import { getDurationForMode, getNextMode, DEFAULT_SETTINGS } from '../core/types.ts';
 import { StorageService } from '../services/storage.ts';
 import type { TimerSnapshot } from '../services/storage.ts';
@@ -9,7 +9,7 @@ interface TimerStore extends TimerState {
   setMode: (mode: TimerMode) => void;
   setRemainingMs: (ms: number) => void;
   incrementSessions: () => void;
-  reset: (mode?: TimerMode) => void;
+  reset: (mode?: TimerMode, settings?: TimerSettings) => void;
   saveSnapshot: () => void;
   restoreSnapshot: () => Promise<boolean>;
 }
@@ -38,29 +38,22 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
 
   incrementSessions: () => set((s) => ({ sessionsCompleted: s.sessionsCompleted + 1 })),
 
-  reset: (mode) => {
+  reset: (mode, settings) => {
     const m = mode ?? get().mode;
-    const totalMs = getDurationForMode(m, DEFAULT_SETTINGS);
+    const s = settings ?? DEFAULT_SETTINGS;
+    const totalMs = getDurationForMode(m, s);
     set({ mode: m, remainingMs: totalMs, totalMs, status: 'idle' });
     StorageService.clearTimerSnapshot();
   },
 
   saveSnapshot: () => {
     const { status, mode, remainingMs, totalMs, sessionsCompleted } = get();
-    StorageService.saveTimerSnapshot({
-      status,
-      mode,
-      remainingMs,
-      totalMs,
-      sessionsCompleted,
-      savedAt: Date.now(),
-    });
+    StorageService.saveTimerSnapshot({ status, mode, remainingMs, totalMs, sessionsCompleted, savedAt: Date.now() });
   },
 
   restoreSnapshot: async () => {
     const snap: TimerSnapshot | null = await StorageService.loadTimerSnapshot();
     if (!snap) return false;
-
     if (snap.status === 'running') {
       const elapsed = Date.now() - snap.savedAt;
       const adjusted = Math.max(0, snap.remainingMs - elapsed);
@@ -73,7 +66,7 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
       });
     } else {
       set({
-        status: snap.status === 'break' ? 'idle' : snap.status,
+        status: snap.status,
         mode: snap.mode,
         remainingMs: snap.remainingMs,
         totalMs: snap.totalMs,

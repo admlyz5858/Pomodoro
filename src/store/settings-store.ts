@@ -23,7 +23,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
   loadSettings: async () => {
     const saved = await StorageService.loadSettings();
     if (saved) {
-      set({ settings: saved, loaded: true });
+      set({ settings: { ...DEFAULT_SETTINGS, ...saved }, loaded: true });
     } else {
       set({ loaded: true });
     }

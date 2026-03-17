@@ -1,8 +1,11 @@
 import { create } from 'zustand';
-import type { Session, SessionHistory } from '../core/types.ts';
+import type { Session } from '../core/types.ts';
 import { StorageService } from '../services/storage.ts';
 
-interface SessionStore extends SessionHistory {
+interface SessionStore {
+  sessions: Session[];
+  totalFocusMs: number;
+  totalSessions: number;
   loaded: boolean;
   addSession: (session: Session) => void;
   loadSessions: () => Promise<void>;

@@ -1,24 +1,22 @@
+import { formatMs } from '../../core/types.ts';
+
 interface TimerDisplayProps {
   remainingMs: number;
+  isRunning: boolean;
 }
 
-function padTwo(n: number): string {
-  return n.toString().padStart(2, '0');
-}
-
-export function TimerDisplay({ remainingMs }: TimerDisplayProps) {
-  const totalSeconds = Math.ceil(remainingMs / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
+export function TimerDisplay({ remainingMs, isRunning }: TimerDisplayProps) {
+  const display = formatMs(remainingMs);
+  const isLast10 = remainingMs <= 10000 && remainingMs > 0 && isRunning;
 
   return (
-    <div className="flex flex-col items-center gap-1">
-      <span
-        className="text-7xl font-light tracking-tight text-text-primary tabular-nums select-none"
-        style={{ fontVariantNumeric: 'tabular-nums' }}
-      >
-        {padTwo(minutes)}:{padTwo(seconds)}
-      </span>
-    </div>
+    <span
+      className={`text-[5rem] leading-none font-extralight tracking-tight text-text-primary tabular-nums select-none transition-all duration-300 ${
+        isLast10 ? 'text-glow-accent scale-105' : ''
+      }`}
+      style={{ fontVariantNumeric: 'tabular-nums' }}
+    >
+      {display}
+    </span>
   );
 }
