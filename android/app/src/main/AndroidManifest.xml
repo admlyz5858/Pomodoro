@@ -31,10 +31,6 @@
             android:name=".TimerWidgetService"
             android:exported="false" />
 
-        <service
-            android:name=".TaskNotificationService"
-            android:exported="false" />
-
         <receiver
             android:name=".TimerWidget"
             android:exported="true">

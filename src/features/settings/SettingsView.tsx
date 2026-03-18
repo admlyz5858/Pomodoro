@@ -245,8 +245,8 @@ export function SettingsView() {
               updateSettings({ lockScreenTasks: v });
               await LockScreenTasksService.setEnabled(v);
               if (v) {
-                const { tasks } = useTaskStore.getState();
-                await LockScreenTasksService.syncTasks(tasks);
+                const { tasks: currentTasks } = useTaskStore.getState();
+                await LockScreenTasksService.syncTasks(currentTasks);
               }
             }}
           />

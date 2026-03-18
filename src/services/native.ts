@@ -23,6 +23,20 @@ export const NativeService = {
 
     await LocalNotifications.requestPermissions();
 
+    try {
+      await LocalNotifications.createChannel({
+        id: 'tasks_lockscreen',
+        name: 'Lock Screen Tasks',
+        description: 'Shows your to-do list on the lock screen',
+        importance: 4,
+        visibility: 1,
+        vibration: false,
+        sound: '',
+      });
+    } catch {
+      // Channel might already exist
+    }
+
     App.addListener('backButton', ({ canGoBack }) => {
       if (!canGoBack) {
         App.minimizeApp();

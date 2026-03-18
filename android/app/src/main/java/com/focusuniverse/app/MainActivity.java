@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.view.WindowManager;
@@ -18,7 +19,6 @@ public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         registerPlugin(WidgetBridge.class);
-        registerPlugin(LockScreenTasksBridge.class);
         super.onCreate(savedInstanceState);
 
         createNotificationChannels();
@@ -40,13 +40,13 @@ public class MainActivity extends BridgeActivity {
             manager.createNotificationChannel(timerChannel);
 
             NotificationChannel tasksChannel = new NotificationChannel(
-                TaskNotificationService.CHANNEL_ID,
+                "tasks_lockscreen",
                 "Lock Screen Tasks",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_HIGH
             );
             tasksChannel.setDescription("Shows your to-do list on the lock screen");
             tasksChannel.setShowBadge(true);
-            tasksChannel.setLockscreenVisibility(android.app.Notification.VISIBILITY_PUBLIC);
+            tasksChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             tasksChannel.enableVibration(false);
             tasksChannel.setSound(null, null);
             tasksChannel.enableLights(false);
