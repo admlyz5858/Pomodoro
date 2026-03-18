@@ -13,6 +13,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         registerPlugin(WidgetBridge.class);
+        registerPlugin(LockScreenTasksBridge.class);
         super.onCreate(savedInstanceState);
 
         createNotificationChannel();

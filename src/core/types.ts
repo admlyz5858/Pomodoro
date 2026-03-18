@@ -25,6 +25,7 @@ export interface TimerSettings {
   dailyGoal: number;
   themeId: string;
   selectedPlantSpecies: string;
+  lockScreenTasks: boolean;
 }
 
 export interface Session {
@@ -100,6 +101,7 @@ export const DEFAULT_SETTINGS: TimerSettings = {
   dailyGoal: 8,
   themeId: 'midnight',
   selectedPlantSpecies: 'oak',
+  lockScreenTasks: false,
 };
 
 export const PLANT_STAGE_THRESHOLDS: Record<PlantStage, number> = {

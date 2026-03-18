@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { Task } from '../core/types.ts';
 import { StorageService } from '../services/storage.ts';
 import { splitTaskWithAI } from '../services/ai-tasks.ts';
+import { LockScreenTasksService } from '../services/lock-screen-tasks.ts';
 
 interface TaskStore {
   tasks: Task[];
@@ -20,6 +21,7 @@ interface TaskStore {
 
 function persist(tasks: Task[]) {
   StorageService.saveTasks(tasks);
+  LockScreenTasksService.syncTasks(tasks);
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
@@ -92,6 +94,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   loadTasks: async () => {
     const tasks = await StorageService.loadTasks();
     set({ tasks, loaded: true });
+    LockScreenTasksService.syncTasks(tasks);
   },
 
   clearCompleted: () => {

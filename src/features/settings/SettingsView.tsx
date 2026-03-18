@@ -9,6 +9,7 @@ import { THEMES, applyTheme } from '../../core/themes.ts';
 import { PLANT_SPECIES } from '../../core/plants.ts';
 import { useI18n } from '../../core/i18n.ts';
 import type { Locale } from '../../core/i18n.ts';
+import { LockScreenTasksService } from '../../services/lock-screen-tasks.ts';
 
 function DurationInput({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   const minutes = Math.round(value / 60000);
@@ -227,7 +228,28 @@ export function SettingsView() {
       {/* Effects */}
       <GlassCard className="p-4">
         <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">{t('effects')}</h3>
-        <Toggle label={t('particles')} value={settings.particlesEnabled} onChange={(v) => updateSettings({ particlesEnabled: v })} />
+        <div className="flex flex-col gap-3">
+          <Toggle label={t('particles')} value={settings.particlesEnabled} onChange={(v) => updateSettings({ particlesEnabled: v })} />
+        </div>
+      </GlassCard>
+
+      {/* Lock Screen Tasks */}
+      <GlassCard className="p-4">
+        <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">🔒 Lock Screen Tasks</h3>
+        <div className="flex flex-col gap-3">
+          <Toggle
+            label="Show tasks on lock screen"
+            value={settings.lockScreenTasks ?? false}
+            onChange={(v) => {
+              updateSettings({ lockScreenTasks: v });
+              LockScreenTasksService.setEnabled(v);
+            }}
+          />
+          <p className="text-[10px] text-text-muted leading-relaxed">
+            Shows your to-do list as a persistent notification visible on the lock screen.
+            You can complete tasks directly from the notification without unlocking.
+          </p>
+        </div>
       </GlassCard>
 
       {/* Data */}
