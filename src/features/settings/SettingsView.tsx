@@ -10,6 +10,7 @@ import { PLANT_SPECIES } from '../../core/plants.ts';
 import { useI18n } from '../../core/i18n.ts';
 import type { Locale } from '../../core/i18n.ts';
 import { LockScreenTasksService } from '../../services/lock-screen-tasks.ts';
+import { useTaskStore } from '../../store/task-store.ts';
 
 function DurationInput({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   const minutes = Math.round(value / 60000);
@@ -240,15 +241,32 @@ export function SettingsView() {
           <Toggle
             label="Show tasks on lock screen"
             value={settings.lockScreenTasks ?? false}
-            onChange={(v) => {
+            onChange={async (v) => {
               updateSettings({ lockScreenTasks: v });
-              LockScreenTasksService.setEnabled(v);
+              await LockScreenTasksService.setEnabled(v);
+              if (v) {
+                const { tasks } = useTaskStore.getState();
+                await LockScreenTasksService.syncTasks(tasks);
+              }
             }}
           />
           <p className="text-[10px] text-text-muted leading-relaxed">
             Shows your to-do list as a persistent notification visible on the lock screen.
-            You can complete tasks directly from the notification without unlocking.
+            Complete tasks directly from the notification without unlocking.
           </p>
+          {settings.lockScreenTasks && (
+            <div className="bg-surface-light/50 rounded-lg p-2.5">
+              <p className="text-[10px] text-text-secondary leading-relaxed">
+                <strong>Not visible?</strong> Check these settings on your phone:
+              </p>
+              <ul className="text-[10px] text-text-muted mt-1 space-y-0.5 list-disc list-inside">
+                <li>Settings → Notifications → Focus Universe → Allow notifications</li>
+                <li>Settings → Notifications → Lock screen → Show all notifications</li>
+                <li>Settings → Lock Screen → Notifications → Show content</li>
+                <li>Battery settings → Focus Universe → No restrictions</li>
+              </ul>
+            </div>
+          )}
         </div>
       </GlassCard>
 

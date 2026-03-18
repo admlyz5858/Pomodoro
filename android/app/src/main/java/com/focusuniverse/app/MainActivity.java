@@ -1,10 +1,15 @@
 package com.focusuniverse.app;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.os.Build;
 import android.view.WindowManager;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.getcapacitor.BridgeActivity;
 
@@ -16,24 +21,48 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(LockScreenTasksBridge.class);
         super.onCreate(savedInstanceState);
 
-        createNotificationChannel();
+        createNotificationChannels();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        requestNotificationPermission();
     }
 
-    private void createNotificationChannel() {
+    private void createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                "timer",
-                "Timer",
-                NotificationManager.IMPORTANCE_LOW
-            );
-            channel.setDescription("Focus Universe timer notifications");
-            channel.enableVibration(true);
-            channel.setShowBadge(true);
-
             NotificationManager manager = getSystemService(NotificationManager.class);
-            if (manager != null) {
-                manager.createNotificationChannel(channel);
+            if (manager == null) return;
+
+            NotificationChannel timerChannel = new NotificationChannel(
+                "timer", "Timer", NotificationManager.IMPORTANCE_LOW
+            );
+            timerChannel.setDescription("Focus Universe timer notifications");
+            timerChannel.enableVibration(true);
+            timerChannel.setShowBadge(true);
+            manager.createNotificationChannel(timerChannel);
+
+            NotificationChannel tasksChannel = new NotificationChannel(
+                TaskNotificationService.CHANNEL_ID,
+                "Lock Screen Tasks",
+                NotificationManager.IMPORTANCE_DEFAULT
+            );
+            tasksChannel.setDescription("Shows your to-do list on the lock screen");
+            tasksChannel.setShowBadge(true);
+            tasksChannel.setLockscreenVisibility(android.app.Notification.VISIBILITY_PUBLIC);
+            tasksChannel.enableVibration(false);
+            tasksChannel.setSound(null, null);
+            tasksChannel.enableLights(false);
+            manager.createNotificationChannel(tasksChannel);
+        }
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{ Manifest.permission.POST_NOTIFICATIONS },
+                    1001
+                );
             }
         }
     }
