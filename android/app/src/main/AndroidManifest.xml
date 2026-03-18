@@ -27,11 +27,18 @@
 
         </activity>
 
+        <service
+            android:name=".TimerWidgetService"
+            android:exported="false" />
+
         <receiver
             android:name=".TimerWidget"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.focusuniverse.PLAY_PAUSE" />
+                <action android:name="com.focusuniverse.RESET" />
+                <action android:name="com.focusuniverse.SKIP" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

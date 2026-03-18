@@ -6,6 +6,7 @@ import { useSessionStore } from '../store/session-store.ts';
 import { useGameStore } from '../store/game-store.ts';
 import { useTaskStore } from '../store/task-store.ts';
 import { NativeService } from '../services/native.ts';
+import { syncWidgetState } from '../services/widget-bridge.ts';
 import { formatMs } from '../core/types.ts';
 import type { Session, TimerMode } from '../core/types.ts';
 
@@ -90,6 +91,12 @@ export function useTimer() {
   useEffect(() => {
     const engine = engineRef.current;
     if (!engine) return;
+    const sessionsToday = useSessionStore.getState().sessions.filter((s) => {
+      const today = new Date().toISOString().slice(0, 10);
+      return s.mode === 'focus' && s.completed && new Date(s.completedAt).toISOString().slice(0, 10) === today;
+    }).length;
+    const streak = useGameStore.getState().currentStreak;
+
     if (status === 'running') {
       const alreadyElapsed = totalMs - remainingMs;
       sessionStartRef.current = sessionStartRef.current || Date.now();
@@ -109,6 +116,8 @@ export function useTimer() {
       NativeService.cancelTimerNotification();
       NativeService.keepScreenOn(false);
     }
+
+    syncWidgetState({ status, mode, remainingMs, totalMs, sessionsToday, streak });
   }, [status]);
 
   const start = useCallback(() => {

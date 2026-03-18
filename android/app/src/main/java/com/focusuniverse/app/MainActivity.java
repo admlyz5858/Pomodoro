@@ -12,10 +12,10 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        registerPlugin(WidgetBridge.class);
         super.onCreate(savedInstanceState);
 
         createNotificationChannel();
-
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
