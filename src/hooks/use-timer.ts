@@ -6,8 +6,7 @@ import { useSessionStore } from '../store/session-store.ts';
 import { useGameStore } from '../store/game-store.ts';
 import { useTaskStore } from '../store/task-store.ts';
 import { NativeService } from '../services/native.ts';
-import { syncWidgetState } from '../services/widget-bridge.ts';
-import { formatMs } from '../core/types.ts';
+import { syncWidgetState, startNativeTimer, stopNativeTimer } from '../services/widget-bridge.ts';
 import type { Session, TimerMode } from '../core/types.ts';
 
 export function useTimer() {
@@ -58,7 +57,7 @@ export function useTimer() {
     });
 
     NativeService.vibrate('success');
-    NativeService.cancelTimerNotification();
+    stopNativeTimer();
     NativeService.keepScreenOn(false);
 
     const label = mode === 'focus' ? 'Focus session complete!' : 'Break is over!';
@@ -102,18 +101,14 @@ export function useTimer() {
       sessionStartRef.current = sessionStartRef.current || Date.now();
       engine.start(totalMs, alreadyElapsed);
       NativeService.keepScreenOn(true);
-      const modeLabel = mode === 'focus' ? 'Focusing' : 'Break';
-      NativeService.showTimerNotification(
-        `${modeLabel} — ${formatMs(remainingMs)}`,
-        'Focus Universe is running',
-      );
+      startNativeTimer(mode, remainingMs, totalMs);
     } else if (status === 'paused') {
       engine.pause();
-      NativeService.cancelTimerNotification();
+      stopNativeTimer();
       NativeService.keepScreenOn(false);
     } else {
       engine.stop();
-      NativeService.cancelTimerNotification();
+      stopNativeTimer();
       NativeService.keepScreenOn(false);
     }
 
@@ -140,7 +135,7 @@ export function useTimer() {
     engineRef.current?.stop();
     sessionStartRef.current = 0;
     NativeService.vibrate('light');
-    NativeService.cancelTimerNotification();
+    stopNativeTimer();
     NativeService.keepScreenOn(false);
     reset(mode, settings);
   }, [reset, mode, settings]);
@@ -149,7 +144,7 @@ export function useTimer() {
     engineRef.current?.stop();
     sessionStartRef.current = 0;
     NativeService.vibrate('medium');
-    NativeService.cancelTimerNotification();
+    stopNativeTimer();
     NativeService.keepScreenOn(false);
     let newSessions = sessionsCompleted;
     if (mode === 'focus') {

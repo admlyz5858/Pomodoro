@@ -8,7 +8,9 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 @CapacitorPlugin(name = "WidgetBridge")
 public class WidgetBridge extends Plugin {
@@ -33,7 +35,6 @@ public class WidgetBridge extends Plugin {
         state.setLastUpdate(System.currentTimeMillis());
 
         refreshWidget();
-
         call.resolve();
     }
 
@@ -50,6 +51,38 @@ public class WidgetBridge extends Plugin {
         result.put("streak", state.getStreak());
 
         call.resolve(result);
+    }
+
+    @PluginMethod()
+    public void startFocusService(PluginCall call) {
+        String mode = call.getString("mode", "focus");
+        long remainingMs = call.getLong("remainingMs", 25L * 60 * 1000);
+        long totalMs = call.getLong("totalMs", 25L * 60 * 1000);
+
+        Context ctx = getContext();
+        Intent intent = new Intent(ctx, FocusService.class);
+        intent.setAction(FocusService.ACTION_START);
+        intent.putExtra(FocusService.EXTRA_MODE, mode);
+        intent.putExtra(FocusService.EXTRA_REMAINING_MS, remainingMs);
+        intent.putExtra(FocusService.EXTRA_TOTAL_MS, totalMs);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ctx.startForegroundService(intent);
+        } else {
+            ctx.startService(intent);
+        }
+
+        call.resolve();
+    }
+
+    @PluginMethod()
+    public void stopFocusService(PluginCall call) {
+        Context ctx = getContext();
+        Intent intent = new Intent(ctx, FocusService.class);
+        intent.setAction(FocusService.ACTION_STOP);
+        ctx.startService(intent);
+
+        call.resolve();
     }
 
     private void refreshWidget() {

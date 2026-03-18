@@ -39,6 +39,19 @@ public class MainActivity extends BridgeActivity {
             timerChannel.setShowBadge(true);
             manager.createNotificationChannel(timerChannel);
 
+            NotificationChannel focusChannel = new NotificationChannel(
+                FocusService.CHANNEL_ID,
+                "Focus Timer Active",
+                NotificationManager.IMPORTANCE_HIGH
+            );
+            focusChannel.setDescription("Active timer on lock screen and AOD");
+            focusChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            focusChannel.setShowBadge(true);
+            focusChannel.enableVibration(false);
+            focusChannel.setSound(null, null);
+            focusChannel.setBypassDnd(true);
+            manager.createNotificationChannel(focusChannel);
+
             NotificationChannel tasksChannel = new NotificationChannel(
                 "tasks_lockscreen",
                 "Lock Screen Tasks",
